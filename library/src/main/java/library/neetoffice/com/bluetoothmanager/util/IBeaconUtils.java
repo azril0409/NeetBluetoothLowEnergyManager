@@ -1,7 +1,7 @@
 package library.neetoffice.com.bluetoothmanager.util;
 
 
-import library.neetoffice.com.bluetoothmanager.device.BluetoothLeDevice;
+import library.neetoffice.com.bluetoothmanager.device.BluetoothLeDeviceImpl;
 import library.neetoffice.com.bluetoothmanager.device.adrecord.AdRecord;
 
 public class IBeaconUtils {
@@ -51,12 +51,12 @@ public class IBeaconUtils {
     }
 
     /**
-     * Ascertains whether a {@link library.neetoffice.com.bluetoothmanager.device.BluetoothLeDevice} is an iBeacon;
+     * Ascertains whether a {@link BluetoothLeDeviceImpl} is an iBeacon;
      *
-     * @param device a {@link library.neetoffice.com.bluetoothmanager.device.BluetoothLeDevice} device.
+     * @param device a {@link BluetoothLeDeviceImpl} device.
      * @return
      */
-    public static boolean isThisAnIBeacon(BluetoothLeDevice device) {
+    public static boolean isThisAnIBeacon(BluetoothLeDeviceImpl device) {
         return isThisAnIBeacon(
                 device.getAdRecordStore().getRecordDataAsString(AdRecord.TYPE_MANUFACTURER_SPECIFIC_DATA).getBytes());
     }

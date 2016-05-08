@@ -2,7 +2,7 @@ package library.neetoffice.com.bluetoothmanager.device.mfdata;
 
 import java.util.Arrays;
 
-import library.neetoffice.com.bluetoothmanager.device.BluetoothLeDevice;
+import library.neetoffice.com.bluetoothmanager.device.BluetoothLeDeviceImpl;
 import library.neetoffice.com.bluetoothmanager.device.adrecord.AdRecord;
 import library.neetoffice.com.bluetoothmanager.util.ByteUtils;
 
@@ -53,7 +53,7 @@ public final class IBeaconManufacturerData {
     private final int mMinor;
     private final String mUUID;
 
-    public IBeaconManufacturerData(BluetoothLeDevice device) {
+    public IBeaconManufacturerData(BluetoothLeDeviceImpl device) {
         this(device.getAdRecordStore().getRecord(AdRecord.TYPE_MANUFACTURER_SPECIFIC_DATA).getData());
     }
 

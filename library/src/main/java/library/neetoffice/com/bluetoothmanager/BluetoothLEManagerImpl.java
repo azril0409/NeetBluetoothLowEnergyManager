@@ -4,8 +4,8 @@ import android.bluetooth.BluetoothDevice;
 import android.os.Build;
 import android.os.Handler;
 
-import library.neetoffice.com.bluetoothmanager.device.BluetoothLeDevice;
-import library.neetoffice.com.bluetoothmanager.device.IBeaconDevice;
+import library.neetoffice.com.bluetoothmanager.device.BluetoothLeDeviceImpl;
+import library.neetoffice.com.bluetoothmanager.device.IBeaconDeviceImpl;
 import library.neetoffice.com.bluetoothmanager.util.IBeaconUtils;
 
 /**
@@ -33,8 +33,8 @@ public abstract class BluetoothLEManagerImpl implements BluetoothLEManager {
         return false;
     }
 
-    protected final void postBluetoothLeDevice(BluetoothLeDevice bluetoothLeDevice) {
-        handler.post(new Task(bluetoothLeDevice));
+    protected final void postBluetoothLeDevice(BluetoothLeDeviceImpl bluetoothLeDeviceImpl) {
+        handler.post(new Task(bluetoothLeDeviceImpl));
     }
 
     protected final void postBluetoothDevice(BluetoothDevice bluetoothDevice) {
@@ -42,17 +42,17 @@ public abstract class BluetoothLEManagerImpl implements BluetoothLEManager {
     }
 
     private class Task implements Runnable {
-        private final BluetoothLeDevice bluetoothLeDevice;
+        private final BluetoothLeDeviceImpl bluetoothLeDeviceImpl;
         private final BluetoothDevice bluetoothDevice;
 
-        private Task(BluetoothLeDevice bluetoothLeDevice) {
-            this.bluetoothLeDevice = bluetoothLeDevice;
+        private Task(BluetoothLeDeviceImpl bluetoothLeDeviceImpl) {
+            this.bluetoothLeDeviceImpl = bluetoothLeDeviceImpl;
             bluetoothDevice = null;
         }
 
 
         public Task(BluetoothDevice bluetoothDevice) {
-            bluetoothLeDevice = null;
+            bluetoothLeDeviceImpl = null;
             this.bluetoothDevice = bluetoothDevice;
         }
 
@@ -60,16 +60,16 @@ public abstract class BluetoothLEManagerImpl implements BluetoothLEManager {
         public void run() {
             if (scanCallback != null) {
                 synchronized (scanCallback) {
-                    if (bluetoothLeDevice != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-                        if (IBeaconUtils.isThisAnIBeacon(bluetoothLeDevice)) {
-                            final IBeaconDevice iBeaconDevice = new IBeaconDevice(bluetoothLeDevice);
+                    if (bluetoothLeDeviceImpl != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+                        if (IBeaconUtils.isThisAnIBeacon(bluetoothLeDeviceImpl)) {
+                            final IBeaconDeviceImpl iBeaconDevice = new IBeaconDeviceImpl(bluetoothLeDeviceImpl);
                             scanCallback.onScanResult(iBeaconDevice);
                         } else {
-                            scanCallback.onScanResult(bluetoothLeDevice);
+                            scanCallback.onScanResult(bluetoothLeDeviceImpl);
                         }
                     }
                     if (bluetoothDevice != null) {
-                        scanCallback.onScanResult(bluetoothLeDevice);
+                        scanCallback.onScanResult(bluetoothLeDeviceImpl);
                     }
                 }
             }

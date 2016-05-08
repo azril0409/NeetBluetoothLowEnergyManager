@@ -6,14 +6,13 @@ import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
 import java.util.Calendar;
 import java.util.UUID;
 
-import library.neetoffice.com.bluetoothmanager.device.BluetoothLeDevice;
+import library.neetoffice.com.bluetoothmanager.device.BluetoothLeDeviceImpl;
 
 
 /**
@@ -30,8 +29,8 @@ public class BluetoothLEManagerForJB2 extends BluetoothLEManagerImpl {
 
         @Override
         public void onLeScan(BluetoothDevice device, int rssi, byte[] scanRecord) {
-            final BluetoothLeDevice bluetoothLeDevice = new BluetoothLeDevice(device, rssi, scanRecord, Calendar.getInstance().getTimeInMillis());
-            postBluetoothLeDevice(bluetoothLeDevice);
+            final BluetoothLeDeviceImpl bluetoothLeDeviceImpl = new BluetoothLeDeviceImpl(device, rssi, scanRecord, Calendar.getInstance().getTimeInMillis());
+            postBluetoothLeDevice(bluetoothLeDeviceImpl);
         }
     };
 

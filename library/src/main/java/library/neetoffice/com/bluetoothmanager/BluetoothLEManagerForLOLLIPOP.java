@@ -11,7 +11,6 @@ import android.bluetooth.le.ScanSettings;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
-import android.os.Handler;
 import android.os.ParcelUuid;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -21,7 +20,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.UUID;
 
-import library.neetoffice.com.bluetoothmanager.device.BluetoothLeDevice;
+import library.neetoffice.com.bluetoothmanager.device.BluetoothLeDeviceImpl;
 
 
 /**
@@ -52,8 +51,8 @@ public class BluetoothLEManagerForLOLLIPOP extends BluetoothLEManagerImpl {
                 postBluetoothDevice(bluetoothDevice);
                 return;
             } else {
-                final BluetoothLeDevice bluetoothLeDevice = new BluetoothLeDevice(bluetoothDevice, result.getRssi(), scanRecord.getBytes(), Calendar.getInstance().getTimeInMillis());
-                postBluetoothLeDevice(bluetoothLeDevice);
+                final BluetoothLeDeviceImpl bluetoothLeDeviceImpl = new BluetoothLeDeviceImpl(bluetoothDevice, result.getRssi(), scanRecord.getBytes(), Calendar.getInstance().getTimeInMillis());
+                postBluetoothLeDevice(bluetoothLeDeviceImpl);
             }
         }
 
