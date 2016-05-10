@@ -17,11 +17,14 @@ public class BluetoothModel {
 
 
     public BluetoothModel(BluetoothDevice bluetoothDevice) {
+        this.bluetoothDevice = bluetoothDevice;
     }
 
     public BluetoothModel(BluetoothLeDevice bluetoothLeDevice) {
+        this.bluetoothLeDevice = bluetoothLeDevice;
     }
 
     public BluetoothModel(IBeaconDevice iBeaconDevice) {
+        this.iBeaconDevice = iBeaconDevice;
     }
 }

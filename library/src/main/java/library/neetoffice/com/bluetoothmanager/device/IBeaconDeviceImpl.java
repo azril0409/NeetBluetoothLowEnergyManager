@@ -49,7 +49,7 @@ public class IBeaconDeviceImpl extends BluetoothLeDeviceImpl implements IBeaconD
      * @param device the device
      * @throws IllegalArguementException if the passed device is not an iBecon
      */
-    public IBeaconDeviceImpl(BluetoothLeDeviceImpl device) {
+    public IBeaconDeviceImpl(BluetoothLeDevice device) {
         super(device);
         validate();
         mIBeaconData = new IBeaconManufacturerData(this);
@@ -147,6 +147,5 @@ public class IBeaconDeviceImpl extends BluetoothLeDeviceImpl implements IBeaconD
             throw new IllegalArgumentException("Device " + getDevice() + " is not an iBeacon.");
         }
     }
-
 
 }

@@ -1,6 +1,5 @@
 package library.neetoffice.com.bluetoothmanager.device;
 
-import library.neetoffice.com.bluetoothmanager.device.mfdata.IBeaconManufacturerData;
 import library.neetoffice.com.bluetoothmanager.util.IBeaconUtils;
 
 /**

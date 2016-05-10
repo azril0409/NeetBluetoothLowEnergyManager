@@ -1,14 +1,15 @@
 package library.neetoffice.com.bluetoothmanager.device;
 
-import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.Map;
-
 import android.bluetooth.BluetoothDevice;
 import android.os.Bundle;
 import android.os.Parcel;
-import android.os.Parcelable;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.Map;
 
 import library.neetoffice.com.bluetoothmanager.device.adrecord.AdRecordStore;
 import library.neetoffice.com.bluetoothmanager.resolvers.BluetoothClassResolver;
@@ -26,27 +27,6 @@ import library.neetoffice.com.bluetoothmanager.util.LimitedLinkHashMap;
  * @author Alexandros Schillings
  */
 public class BluetoothLeDeviceImpl implements BluetoothLeDevice {
-    private static final String PARCEL_EXTRA_BLUETOOTH_DEVICE = "bluetooth_device";
-    private static final String PARCEL_EXTRA_CURRENT_RSSI = "current_rssi";
-    private static final String PARCEL_EXTRA_CURRENT_TIMESTAMP = "current_timestamp";
-    private static final String PARCEL_EXTRA_DEVICE_RSSI_LOG = "device_rssi_log";
-    private static final String PARCEL_EXTRA_DEVICE_SCANRECORD = "device_scanrecord";
-    private static final String PARCEL_EXTRA_DEVICE_SCANRECORD_STORE = "device_scanrecord_store";
-    private static final String PARCEL_EXTRA_FIRST_RSSI = "device_first_rssi";
-    private static final String PARCEL_EXTRA_FIRST_TIMESTAMP = "first_timestamp";
-    private static final long LOG_INVALIDATION_THRESHOLD = 10 * 1000;
-    protected static final int MAX_RSSI_LOG_SIZE = 10;
-
-    private final AdRecordStore mRecordStore;
-    private final BluetoothDevice mDevice;
-    private final Map<Long, Integer> mRssiLog;
-    private final byte[] mScanRecord;
-    private final int mFirstRssi;
-    private final long mFirstTimestamp;
-
-    private int mCurrentRssi;
-    private long mCurrentTimestamp;
-
     /**
      * The Constant CREATOR.
      */
@@ -59,6 +39,24 @@ public class BluetoothLeDeviceImpl implements BluetoothLeDevice {
             return new BluetoothLeDeviceImpl[size];
         }
     };
+    protected static final int MAX_RSSI_LOG_SIZE = 10;
+    private static final String PARCEL_EXTRA_BLUETOOTH_DEVICE = "bluetooth_device";
+    private static final String PARCEL_EXTRA_CURRENT_RSSI = "current_rssi";
+    private static final String PARCEL_EXTRA_CURRENT_TIMESTAMP = "current_timestamp";
+    private static final String PARCEL_EXTRA_DEVICE_RSSI_LOG = "device_rssi_log";
+    private static final String PARCEL_EXTRA_DEVICE_SCANRECORD = "device_scanrecord";
+    private static final String PARCEL_EXTRA_DEVICE_SCANRECORD_STORE = "device_scanrecord_store";
+    private static final String PARCEL_EXTRA_FIRST_RSSI = "device_first_rssi";
+    private static final String PARCEL_EXTRA_FIRST_TIMESTAMP = "first_timestamp";
+    private static final long LOG_INVALIDATION_THRESHOLD = 10 * 1000;
+    private final AdRecordStore mRecordStore;
+    private final BluetoothDevice mDevice;
+    private final Map<Long, Integer> mRssiLog;
+    private final byte[] mScanRecord;
+    private final int mFirstRssi;
+    private final long mFirstTimestamp;
+    private int mCurrentRssi;
+    private long mCurrentTimestamp;
 
     /**
      * Instantiates a new Bluetooth LE device.
@@ -83,7 +81,7 @@ public class BluetoothLeDeviceImpl implements BluetoothLeDevice {
      *
      * @param device the device
      */
-    public BluetoothLeDeviceImpl(BluetoothLeDeviceImpl device) {
+    public BluetoothLeDeviceImpl(BluetoothLeDevice device) {
         mCurrentRssi = device.getRssi();
         mCurrentTimestamp = device.getTimestamp();
         mDevice = device.getDevice();
@@ -114,6 +112,25 @@ public class BluetoothLeDeviceImpl implements BluetoothLeDevice {
     }
 
     /**
+     * Resolve bonding state.
+     *
+     * @param bondState the bond state
+     * @return the string
+     */
+    private static String resolveBondingState(int bondState) {
+        switch (bondState) {
+            case BluetoothDevice.BOND_BONDED:
+                return "Paired";
+            case BluetoothDevice.BOND_BONDING:
+                return "Pairing";
+            case BluetoothDevice.BOND_NONE:
+                return "Unbonded";
+            default:
+                return "Unknown";
+        }
+    }
+
+    /**
      * Adds the to rssi log.
      *
      * @param timestamp   the timestamp
@@ -124,7 +141,6 @@ public class BluetoothLeDeviceImpl implements BluetoothLeDevice {
             if (timestamp - mCurrentTimestamp > LOG_INVALIDATION_THRESHOLD) {
                 mRssiLog.clear();
             }
-
             mCurrentRssi = rssiReading;
             mCurrentTimestamp = timestamp;
             mRssiLog.put(timestamp, rssiReading);
@@ -284,8 +300,12 @@ public class BluetoothLeDeviceImpl implements BluetoothLeDevice {
             final Iterator<Long> it1 = mRssiLog.keySet().iterator();
 
             while (it1.hasNext()) {
+                final Long t = it1.next();
+                if (mCurrentTimestamp - t > LOG_INVALIDATION_THRESHOLD) {
+                    continue;
+                }
                 count++;
-                sum += mRssiLog.get(it1.next());
+                sum += mRssiLog.get(t);
             }
         }
         //		for(final Map.Entry<Long,Integer> e : mRssiLog.entrySet()){
@@ -299,6 +319,43 @@ public class BluetoothLeDeviceImpl implements BluetoothLeDevice {
             return 0;
         }
 
+    }
+
+
+    /**
+     * Gets the running median rssi.
+     *
+     * @return the running median rssi
+     */
+    @Override
+    public double getRunningMedianRssi() {
+        synchronized (mRssiLog) {
+            final ArrayList<Integer> values = new ArrayList<>();
+            final Iterator<Long> it1 = mRssiLog.keySet().iterator();
+            while (it1.hasNext()) {
+                final Long t = it1.next();
+                if (mCurrentTimestamp - t > LOG_INVALIDATION_THRESHOLD) {
+                    continue;
+                }
+                values.add(mRssiLog.get(t));
+            }
+            if (values.size() > 0) {
+                final Integer[] array = values.toArray(new Integer[values.size()]);
+                Arrays.sort(array, new Comparator<Integer>() {
+                    @Override
+                    public int compare(Integer lhs, Integer rhs) {
+                        return rhs - lhs;
+                    }
+                });
+                if (array.length % 2 == 0) {
+                    return (array[(array.length - 1) / 2] + array[array.length / 2]) / 2;
+                } else {
+                    return array[(array.length - 1) / 2];
+                }
+            } else {
+                return 0;
+            }
+        }
     }
 
     /**
@@ -375,24 +432,5 @@ public class BluetoothLeDeviceImpl implements BluetoothLeDevice {
         b.putSerializable(PARCEL_EXTRA_DEVICE_RSSI_LOG, (Serializable) mRssiLog);
 
         parcel.writeBundle(b);
-    }
-
-    /**
-     * Resolve bonding state.
-     *
-     * @param bondState the bond state
-     * @return the string
-     */
-    private static String resolveBondingState(int bondState) {
-        switch (bondState) {
-            case BluetoothDevice.BOND_BONDED:
-                return "Paired";
-            case BluetoothDevice.BOND_BONDING:
-                return "Pairing";
-            case BluetoothDevice.BOND_NONE:
-                return "Unbonded";
-            default:
-                return "Unknown";
-        }
     }
 }

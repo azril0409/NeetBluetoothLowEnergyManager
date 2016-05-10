@@ -34,13 +34,6 @@ public interface BluetoothLeDevice extends Parcelable {
     String getAddress();
 
     /**
-     * Gets the ad record store.
-     *
-     * @return the ad record store
-     */
-    AdRecordStore getAdRecordStore();
-
-    /**
      * Gets the bluetooth device bond state.
      *
      * @return the bluetooth device bond state
@@ -104,6 +97,8 @@ public interface BluetoothLeDevice extends Parcelable {
      */
     double getRunningAverageRssi();
 
+    double getRunningMedianRssi();
+
     /**
      * Gets the scan record.
      *
@@ -127,4 +122,10 @@ public interface BluetoothLeDevice extends Parcelable {
      */
     void updateRssiReading(long timestamp, int rssiReading);
 
+    /**
+     * Gets the ad record store.
+     *
+     * @return the ad record store
+     */
+    AdRecordStore getAdRecordStore();
 }
