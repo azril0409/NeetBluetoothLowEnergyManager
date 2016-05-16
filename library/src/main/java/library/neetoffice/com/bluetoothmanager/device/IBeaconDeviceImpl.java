@@ -70,7 +70,7 @@ public class IBeaconDeviceImpl extends BluetoothLeDeviceImpl implements IBeaconD
      */
     @Override
     public double getAccuracy() {
-        return IBeaconUtils.calculateAccuracy(getCalibratedTxPower(), getRunningAverageRssi());
+        return IBeaconUtils.calculateAccuracy(getCalibratedTxPower(), getRunningMedianRssi());
     }
 
     /**
