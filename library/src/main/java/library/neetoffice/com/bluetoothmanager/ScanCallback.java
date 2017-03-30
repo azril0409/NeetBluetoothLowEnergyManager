@@ -12,11 +12,16 @@ import library.neetoffice.com.bluetoothmanager.device.IBeaconDevice;
  * Created by Deo-chainmeans on 2015/10/8.
  */
 public interface ScanCallback {
-    void onScanResult(BluetoothDevice bluetoothDevice);
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
     void onScanResult(BluetoothLeDevice bluetoothLeDevice);
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
     void onScanResult(IBeaconDevice iBeaconDevice);
+
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
+    void onLost(BluetoothLeDevice bluetoothLeDevice);
+
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
+    void onLost(IBeaconDevice iBeaconDevice);
 }

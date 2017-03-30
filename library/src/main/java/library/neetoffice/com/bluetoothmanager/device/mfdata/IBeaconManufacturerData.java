@@ -1,8 +1,10 @@
 package library.neetoffice.com.bluetoothmanager.device.mfdata;
 
+import android.util.Log;
+
 import java.util.Arrays;
 
-import library.neetoffice.com.bluetoothmanager.device.BluetoothLeDeviceImpl;
+import library.neetoffice.com.bluetoothmanager.device.BluetoothLeDevice;
 import library.neetoffice.com.bluetoothmanager.device.adrecord.AdRecord;
 import library.neetoffice.com.bluetoothmanager.util.ByteUtils;
 
@@ -53,7 +55,7 @@ public final class IBeaconManufacturerData {
     private final int mMinor;
     private final String mUUID;
 
-    public IBeaconManufacturerData(BluetoothLeDeviceImpl device) {
+    public IBeaconManufacturerData(BluetoothLeDevice device) {
         this(device.getAdRecordStore().getRecord(AdRecord.TYPE_MANUFACTURER_SPECIFIC_DATA).getData());
     }
 
@@ -74,6 +76,8 @@ public final class IBeaconManufacturerData {
         mMajor = ByteUtils.getIntFrom2ByteArray(Arrays.copyOfRange(mData, 20, 22));
         mMinor = ByteUtils.getIntFrom2ByteArray(Arrays.copyOfRange(mData, 22, 24));
         mCalibratedTxPower = data[24];
+        Log.d("CalibratedTxPower", ByteUtils.byteArrayToHexString(data));
+        Log.d("CalibratedTxPower", "TxPower = " + data[24]+","+ByteUtils.byteArrayToHexString(data[24]));
     }
 
     /**

@@ -6,12 +6,12 @@ import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
-import android.support.annotation.NonNull;
 import android.util.Log;
 
 import java.util.Calendar;
 import java.util.UUID;
 
+import library.neetoffice.com.bluetoothmanager.device.BluetoothLeDevice;
 import library.neetoffice.com.bluetoothmanager.device.BluetoothLeDeviceImpl;
 
 
@@ -23,8 +23,6 @@ public class BluetoothLEManagerForJB2 extends BluetoothLEManagerImpl {
     private static final String TAG = BluetoothLEManagerForJB2.class.getSimpleName();
     private final Context context;
     private final android.bluetooth.BluetoothManager bluetoothManager;
-    private BluetoothAdapter mBluetoothAdapter;
-    private boolean run = false;
     private final BluetoothAdapter.LeScanCallback leScanCallback = new BluetoothAdapter.LeScanCallback() {
 
         @Override
@@ -33,8 +31,10 @@ public class BluetoothLEManagerForJB2 extends BluetoothLEManagerImpl {
             postBluetoothLeDevice(bluetoothLeDeviceImpl);
         }
     };
+    private BluetoothAdapter mBluetoothAdapter;
+    private boolean run = false;
 
-    public BluetoothLEManagerForJB2(@NonNull Context context) {
+    public BluetoothLEManagerForJB2(Context context) {
         this.context = context;
         bluetoothManager = (android.bluetooth.BluetoothManager) context.getSystemService(Context.BLUETOOTH_SERVICE);
     }
@@ -43,11 +43,6 @@ public class BluetoothLEManagerForJB2 extends BluetoothLEManagerImpl {
     public void onCreate() {
         if (mBluetoothAdapter == null) {
             mBluetoothAdapter = bluetoothManager.getAdapter();
-        }
-        if (mBluetoothAdapter == null || !mBluetoothAdapter.isEnabled()) {
-            final Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            context.startActivity(intent);
         }
     }
 
@@ -102,6 +97,7 @@ public class BluetoothLEManagerForJB2 extends BluetoothLEManagerImpl {
 
     @Override
     public void onDestroy() {
+        super.onDestroy();
         NeetBluetoothLEManager.onDestroy(context);
     }
 }

@@ -18,12 +18,8 @@ public abstract class NeetBluetoothLEManager {
             final BluetoothLEManager bluetoothManager = new BluetoothLEManagerForLOLLIPOP(context);
             bluetoothLEManagers.put(context.getClass().getName(), bluetoothManager);
             return bluetoothManager;
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-            final BluetoothLEManager bluetoothManager = new BluetoothLEManagerForJB2(context);
-            bluetoothLEManagers.put(context.getClass().getName(), bluetoothManager);
-            return bluetoothManager;
         } else {
-            final BluetoothLEManager bluetoothManager = new BluetoothLEManagerForFroyo(context);
+            final BluetoothLEManager bluetoothManager = new BluetoothLEManagerForJB2(context);
             bluetoothLEManagers.put(context.getClass().getName(), bluetoothManager);
             return bluetoothManager;
         }
@@ -31,5 +27,8 @@ public abstract class NeetBluetoothLEManager {
 
     static void onDestroy(Context context) {
         bluetoothLEManagers.remove(context.getClass().getName());
+        if (bluetoothLEManagers.isEmpty()) {
+            BluetoothLEManagerImpl.map.clear();
+        }
     }
 }

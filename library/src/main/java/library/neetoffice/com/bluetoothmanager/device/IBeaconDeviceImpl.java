@@ -6,7 +6,19 @@ import android.os.Parcel;
 import library.neetoffice.com.bluetoothmanager.device.mfdata.IBeaconManufacturerData;
 import library.neetoffice.com.bluetoothmanager.util.IBeaconUtils;
 
+/**
+ * Created by Deo-chainmeans on 2016/9/10.
+ */
 public class IBeaconDeviceImpl extends BluetoothLeDeviceImpl implements IBeaconDevice {
+    public static final Creator<IBeaconDeviceImpl> CREATOR = new Creator<IBeaconDeviceImpl>() {
+        public IBeaconDeviceImpl createFromParcel(Parcel in) {
+            return new IBeaconDeviceImpl(in);
+        }
+
+        public IBeaconDeviceImpl[] newArray(int size) {
+            return new IBeaconDeviceImpl[size];
+        }
+    };
 
     /**
      * The m iBeacon data.
@@ -19,7 +31,7 @@ public class IBeaconDeviceImpl extends BluetoothLeDeviceImpl implements IBeaconD
      * @param device     the device
      * @param rssi       the RSSI value
      * @param scanRecord the scanRecord
-     * @throws IllegalArguementException if the passed device is not an iBecon
+     * @throws IllegalArgumentException if the passed device is not an iBecon
      */
     public IBeaconDeviceImpl(BluetoothDevice device, int rssi, byte[] scanRecord) {
         super(device, rssi, scanRecord, 0);
@@ -34,7 +46,7 @@ public class IBeaconDeviceImpl extends BluetoothLeDeviceImpl implements IBeaconD
      * @param rssi       the RSSI value of the RSSI measurement
      * @param scanRecord the scan record
      * @param timestamp  the timestamp of the RSSI measurement
-     * @throws IllegalArguementException if the passed device is not an iBecon
+     * @throws IllegalArgumentException if the passed device is not an iBecon
      */
     public IBeaconDeviceImpl(BluetoothDevice device, int rssi, byte[] scanRecord, long timestamp) {
         super(device, rssi, scanRecord, timestamp);
@@ -43,11 +55,11 @@ public class IBeaconDeviceImpl extends BluetoothLeDeviceImpl implements IBeaconD
     }
 
     /**
-     * Will try to convert a {@link BluetoothLeDeviceImpl} into an
+     * Will try to convert a {@link BluetoothLeDevice} into an
      * iBeacon Device.
      *
      * @param device the device
-     * @throws IllegalArguementException if the passed device is not an iBecon
+     * @throws IllegalArgumentException if the passed device is not an iBecon
      */
     public IBeaconDeviceImpl(BluetoothLeDevice device) {
         super(device);
@@ -55,7 +67,7 @@ public class IBeaconDeviceImpl extends BluetoothLeDeviceImpl implements IBeaconD
         mIBeaconData = new IBeaconManufacturerData(this);
     }
 
-    private IBeaconDeviceImpl(Parcel in) {
+    protected IBeaconDeviceImpl(Parcel in) {
         super(in);
         validate();
         mIBeaconData = new IBeaconManufacturerData(this);
@@ -68,9 +80,13 @@ public class IBeaconDeviceImpl extends BluetoothLeDeviceImpl implements IBeaconD
      *
      * @return the accuracy in meters
      */
-    @Override
     public double getAccuracy() {
-        return IBeaconUtils.calculateAccuracy(getCalibratedTxPower(), getRunningMedianRssi());
+        return IBeaconUtils.calculateAccuracy(getCalibratedTxPower(), getRunningAverageRssi());
+    }
+
+    @Override
+    public double getDistance(float coefficient) {
+        return IBeaconUtils.calculateDistance(getCalibratedTxPower(), getRunningAverageRssi(), coefficient);
     }
 
     /**
@@ -78,7 +94,6 @@ public class IBeaconDeviceImpl extends BluetoothLeDeviceImpl implements IBeaconD
      *
      * @return the calibrated TX power
      */
-    @Override
     public int getCalibratedTxPower() {
         return getIBeaconData().getCalibratedTxPower();
     }
@@ -88,7 +103,6 @@ public class IBeaconDeviceImpl extends BluetoothLeDeviceImpl implements IBeaconD
      *
      * @return the company identifier
      */
-    @Override
     public int getCompanyIdentifier() {
         return getIBeaconData().getCompanyIdentifier();
     }
@@ -98,9 +112,8 @@ public class IBeaconDeviceImpl extends BluetoothLeDeviceImpl implements IBeaconD
      *
      * @return the distance descriptor
      */
-    @Override
-    public IBeaconUtils.IBeaconDistanceDescriptor getDistanceDescriptor() {
-        return IBeaconUtils.getDistanceDescriptor(getAccuracy());
+    public IBeaconUtils.IBeaconDistanceDescriptor getDistanceDescriptor(float coefficient) {
+        return IBeaconUtils.getDistanceDescriptor(getDistance(coefficient));
     }
 
     /**
@@ -117,7 +130,6 @@ public class IBeaconDeviceImpl extends BluetoothLeDeviceImpl implements IBeaconD
      *
      * @return the Major value
      */
-    @Override
     public int getMajor() {
         return getIBeaconData().getMajor();
     }
@@ -127,7 +139,6 @@ public class IBeaconDeviceImpl extends BluetoothLeDeviceImpl implements IBeaconD
      *
      * @return the Minor value
      */
-    @Override
     public int getMinor() {
         return getIBeaconData().getMinor();
     }
@@ -137,7 +148,6 @@ public class IBeaconDeviceImpl extends BluetoothLeDeviceImpl implements IBeaconD
      *
      * @return the UUID
      */
-    @Override
     public String getUUID() {
         return getIBeaconData().getUUID();
     }
@@ -147,5 +157,4 @@ public class IBeaconDeviceImpl extends BluetoothLeDeviceImpl implements IBeaconD
             throw new IllegalArgumentException("Device " + getDevice() + " is not an iBeacon.");
         }
     }
-
 }

@@ -1,12 +1,14 @@
 <resources>
     <string name="app_name">sample</string>
-    <string name="library_mac_text">Mac : %s</string>
+    <string name="library_mac_text" formatted="false">%s (%s)</string>
     <string name="library_uuid_text">UUID : %s</string>
-    <string name="library_rssi_text">RSSI : %s</string>
+    <string name="library_median_rssi_text" formatted="false">Median RSSI : %s, %s</string>
+    <string name="library_rssi_text" formatted="false">Accuracy RSSI : %s , %s</string>
     <string name="library_major_text">Major : %s</string>
     <string name="library_minor_text">Minor : %s</string>
-    <string name="library_descriptor_text">Descriptor : %s m</string>
-    <string name="library_distance_text">Distance : %s</string>
+    <string name="library_distance_text">Distance : %s m</string>
+    <string name="library_descriptor_text">Descriptor : %s</string>
     <string name="library_timestamp_text">TimesTamp : %s</string>
     <string name="library_calibratedtxpower_text">CalibratedTxPower : %s</string>
+    <string name="library_accuracy_text">Accuracy : %s m</string>
 </resources>

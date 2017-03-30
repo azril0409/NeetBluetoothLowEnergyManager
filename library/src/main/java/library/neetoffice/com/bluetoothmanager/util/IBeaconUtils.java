@@ -5,22 +5,23 @@ import library.neetoffice.com.bluetoothmanager.device.BluetoothLeDevice;
 import library.neetoffice.com.bluetoothmanager.device.adrecord.AdRecord;
 
 public class IBeaconUtils {
+    public static final float IDEAL_SPACE = 2;
     private static final double DISTANCE_THRESHOLD_WTF = 0.0;
     private static final double DISTANCE_THRESHOLD_IMMEDIATE = 0.5;
     private static final double DISTANCE_THRESHOLD_NEAR = 3.0;
 
     private static final byte[] MANUFACTURER_DATA_IBEACON_PREFIX = new byte[]{0x4C, 0x00, 0x02, 0x15};
 
-    public static IBeaconDistanceDescriptor getDistanceDescriptor(double accuracy) {
-        if (accuracy < DISTANCE_THRESHOLD_WTF) {
+    public static IBeaconDistanceDescriptor getDistanceDescriptor(double distance) {
+        if (distance < DISTANCE_THRESHOLD_WTF) {
             return IBeaconDistanceDescriptor.UNKNOWN;
         }
 
-        if (accuracy < DISTANCE_THRESHOLD_IMMEDIATE) {
+        if (distance < DISTANCE_THRESHOLD_IMMEDIATE) {
             return IBeaconDistanceDescriptor.IMMEDIATE;
         }
 
-        if (accuracy < DISTANCE_THRESHOLD_NEAR) {
+        if (distance < DISTANCE_THRESHOLD_NEAR) {
             return IBeaconDistanceDescriptor.NEAR;
         }
 
@@ -49,6 +50,27 @@ public class IBeaconUtils {
             return accuracy;
         }
     }
+
+    /**
+     * Calculates the distance of an RSSI reading.
+     * <p/>
+     * The code was taken from {@link http://qiita.com/shu223/items/7c4e87c47eca65724305}
+     *
+     * @param txPower the calibrated TX power of an iBeacon
+     * @param rssi    the RSSI value of the iBeacon
+     * @return
+     */
+    public static double calculateDistance(int txPower, double rssi, float coefficient) {
+        if (rssi == 0) {
+            return -1.0; // if we cannot determine accuracy, return -1.
+        }
+        return Math.pow(10d, ((double) txPower - rssi) / (10 * coefficient));
+    }
+
+    public static void main(String[] args){
+        System.out.println(""+calculateDistance(0,-61,4));
+    }
+
 
     /**
      * Ascertains whether a {@link BluetoothLeDevice} is an iBeacon;

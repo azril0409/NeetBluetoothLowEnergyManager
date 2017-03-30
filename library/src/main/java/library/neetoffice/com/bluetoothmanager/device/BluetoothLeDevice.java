@@ -1,80 +1,41 @@
 package library.neetoffice.com.bluetoothmanager.device;
 
 import android.bluetooth.BluetoothDevice;
+import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.util.Arrays;
-import java.util.Iterator;
 import java.util.Map;
 
 import library.neetoffice.com.bluetoothmanager.device.adrecord.AdRecordStore;
-import library.neetoffice.com.bluetoothmanager.resolvers.BluetoothClassResolver;
+
+// TODO: Auto-generated Javadoc
 
 /**
- * Created by Mac on 2016/05/08.
+ * This is a wrapper around the default BluetoothDevice object
+ * As BluetoothDevice is final it cannot be extended, so to get it you
+ * need to call {@link #getDevice()} method.
+ *
+ * @author Alexandros Schillings
  */
 public interface BluetoothLeDevice extends Parcelable {
+    Creator<BluetoothLeDevice> CREATOR = new Creator<BluetoothLeDevice>() {
+        public BluetoothLeDevice createFromParcel(Parcel in) {
+            return new BluetoothLeDeviceImpl(in);
+        }
 
-    /* (non-Javadoc)
-     * @see android.os.Parcelable#describeContents()
-     */
-    int describeContents();
+        public BluetoothLeDeviceImpl[] newArray(int size) {
+            return new BluetoothLeDeviceImpl[size];
+        }
+    };
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
-    @Override
-    boolean equals(Object obj);
-
-    /**
-     * Gets the address.
-     *
-     * @return the address
-     */
-    String getAddress();
 
     /**
-     * Gets the bluetooth device bond state.
+     * Update rssi reading.
      *
-     * @return the bluetooth device bond state
+     * @param timestamp   the timestamp
+     * @param rssiReading the rssi reading
      */
-    String getBluetoothDeviceBondState();
-
-    /**
-     * Gets the bluetooth device class name.
-     *
-     * @return the bluetooth device class name
-     */
-
-    String getBluetoothDeviceClassName();
-
-    /**
-     * Gets the device.
-     *
-     * @return the device
-     */
-    BluetoothDevice getDevice();
-
-    /**
-     * Gets the first rssi.
-     *
-     * @return the first rssi
-     */
-    int getFirstRssi();
-
-    /**
-     * Gets the first timestamp.
-     *
-     * @return the first timestamp
-     */
-    long getFirstTimestamp();
-
-    /**
-     * Gets the name.
-     *
-     * @return the name
-     */
-    String getName();
+    public void updateRssiReading(long timestamp, int rssiReading);
 
     /**
      * Gets the rssi.
@@ -91,12 +52,60 @@ public interface BluetoothLeDevice extends Parcelable {
     Map<Long, Integer> getRssiLog();
 
     /**
+     * Gets the first rssi.
+     *
+     * @return the first rssi
+     */
+    int getFirstRssi();
+
+    /**
+     * Gets the first timestamp.
+     *
+     * @return the first timestamp
+     */
+    long getFirstTimestamp();
+
+    /**
+     * Gets the address.
+     *
+     * @return the address
+     */
+    String getAddress();
+
+    /**
+     * Gets the ad record store.
+     *
+     * @return the ad record store
+     */
+    AdRecordStore getAdRecordStore();
+
+    /**
+     * Gets the bluetooth device bond state.
+     *
+     * @return the bluetooth device bond state
+     */
+    String getBluetoothDeviceBondState();
+
+    /**
+     * Gets the device.
+     *
+     * @return the device
+     */
+    BluetoothDevice getDevice();
+
+    /**
      * Gets the running average rssi.
      *
      * @return the running average rssi
      */
     double getRunningAverageRssi();
 
+
+    /**
+     * Gets the running median rssi.
+     *
+     * @return the running median rssi
+     */
     double getRunningMedianRssi();
 
     /**
@@ -113,19 +122,8 @@ public interface BluetoothLeDevice extends Parcelable {
      */
     long getTimestamp();
 
-
-    /**
-     * Update rssi reading.
-     *
-     * @param timestamp   the timestamp
-     * @param rssiReading the rssi reading
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
      */
-    void updateRssiReading(long timestamp, int rssiReading);
-
-    /**
-     * Gets the ad record store.
-     *
-     * @return the ad record store
-     */
-    AdRecordStore getAdRecordStore();
+    String toString();
 }
