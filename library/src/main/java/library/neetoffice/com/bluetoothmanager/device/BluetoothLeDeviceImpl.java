@@ -185,10 +185,21 @@ public class BluetoothLeDeviceImpl implements BluetoothLeDevice {
     }
 
     /**
+     * Gets the name.
+     *
+     * @return the name
+     */
+    @Override
+    public String getName() {
+        return mDevice.getName();
+    }
+
+    /**
      * Gets the address.
      *
      * @return the address
      */
+    @Override
     public String getAddress() {
         return mDevice.getAddress();
     }
@@ -245,15 +256,6 @@ public class BluetoothLeDeviceImpl implements BluetoothLeDevice {
      */
     public long getFirstTimestamp() {
         return mFirstTimestamp;
-    }
-
-    /**
-     * Gets the name.
-     *
-     * @return the name
-     */
-    public String getName() {
-        return mDevice.getName();
     }
 
     /**

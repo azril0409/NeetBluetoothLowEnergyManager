@@ -35,7 +35,9 @@ public interface BluetoothLeDevice extends Parcelable {
      * @param timestamp   the timestamp
      * @param rssiReading the rssi reading
      */
-    public void updateRssiReading(long timestamp, int rssiReading);
+    void updateRssiReading(long timestamp, int rssiReading);
+
+    void updateScanRecord(byte[] scanRecord);
 
     /**
      * Gets the rssi.
@@ -64,6 +66,13 @@ public interface BluetoothLeDevice extends Parcelable {
      * @return the first timestamp
      */
     long getFirstTimestamp();
+
+    /**
+     * Gets the name.
+     *
+     * @return the name
+     */
+    String getName();
 
     /**
      * Gets the address.

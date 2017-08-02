@@ -4,14 +4,11 @@ import android.annotation.TargetApi;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Build;
 import android.util.Log;
 
 import java.util.Calendar;
-import java.util.UUID;
 
-import library.neetoffice.com.bluetoothmanager.device.BluetoothLeDevice;
 import library.neetoffice.com.bluetoothmanager.device.BluetoothLeDeviceImpl;
 
 
@@ -21,7 +18,6 @@ import library.neetoffice.com.bluetoothmanager.device.BluetoothLeDeviceImpl;
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class BluetoothLEManagerForJB2 extends BluetoothLEManagerImpl {
     private static final String TAG = BluetoothLEManagerForJB2.class.getSimpleName();
-    private final Context context;
     private final android.bluetooth.BluetoothManager bluetoothManager;
     private final BluetoothAdapter.LeScanCallback leScanCallback = new BluetoothAdapter.LeScanCallback() {
 
@@ -35,39 +31,24 @@ public class BluetoothLEManagerForJB2 extends BluetoothLEManagerImpl {
     private boolean run = false;
 
     public BluetoothLEManagerForJB2(Context context) {
-        this.context = context;
+        super(context);
         bluetoothManager = (android.bluetooth.BluetoothManager) context.getSystemService(Context.BLUETOOTH_SERVICE);
     }
 
     @Override
     public void onCreate() {
+        try {
+            super.onCreate();
+        } catch (SecurityException e) {
+        }
         if (mBluetoothAdapter == null) {
             mBluetoothAdapter = bluetoothManager.getAdapter();
         }
     }
 
     @Override
-    public boolean startScan(String[] uuidFilters, ScanCallback scanCallback) {
-        super.startScan(uuidFilters, scanCallback);
-        if (mBluetoothAdapter != null) {
-            final UUID[] uuids = new UUID[uuidFilters.length];
-            for (int i = 0; i < uuidFilters.length; i++) {
-                uuids[i] = UUID.fromString(uuidFilters[i]);
-            }
-            mBluetoothAdapter.startLeScan(uuids, leScanCallback);
-            run = true;
-        } else {
-            run = false;
-            if (BugConfig.isDebuggable(context)) {
-                Log.d(TAG, "mBluetoothAdapter is null");
-            }
-        }
-        return run;
-    }
-
-    @Override
-    public boolean startScan(ScanCallback scanCallback) {
-        super.startScan(scanCallback);
+    public boolean startScan(ScannerConfig config) {
+        super.startScan(config);
         if (mBluetoothAdapter != null) {
             mBluetoothAdapter.startLeScan(leScanCallback);
             run = true;
@@ -98,6 +79,6 @@ public class BluetoothLEManagerForJB2 extends BluetoothLEManagerImpl {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        NeetBluetoothLEManager.onDestroy(context);
+        BLEScanner.onDestroy(context);
     }
 }

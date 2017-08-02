@@ -11,17 +11,19 @@ import android.bluetooth.le.ScanSettings;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
-import android.os.ParcelUuid;
+import android.support.annotation.RequiresPermission;
 import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.UUID;
 
-import library.neetoffice.com.bluetoothmanager.device.BluetoothLeDevice;
 import library.neetoffice.com.bluetoothmanager.device.BluetoothLeDeviceImpl;
-import library.neetoffice.com.bluetoothmanager.util.ByteUtils;
+
+import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
+import static android.Manifest.permission.ACCESS_FINE_LOCATION;
+import static android.Manifest.permission.BLUETOOTH;
+import static android.Manifest.permission.BLUETOOTH_ADMIN;
 
 
 /**
@@ -30,7 +32,6 @@ import library.neetoffice.com.bluetoothmanager.util.ByteUtils;
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
 public class BluetoothLEManagerForLOLLIPOP extends BluetoothLEManagerImpl {
     private static final String TAG = BluetoothLEManagerForLOLLIPOP.class.getSimpleName();
-    private final Context context;
     private final android.bluetooth.BluetoothManager bluetoothManager;
     private final android.bluetooth.le.ScanCallback leScanCallback = new android.bluetooth.le.ScanCallback() {
 
@@ -60,12 +61,16 @@ public class BluetoothLEManagerForLOLLIPOP extends BluetoothLEManagerImpl {
     private boolean run = false;
 
     public BluetoothLEManagerForLOLLIPOP(Context context) {
-        this.context = context;
+        super(context);
         bluetoothManager = (android.bluetooth.BluetoothManager) context.getSystemService(Context.BLUETOOTH_SERVICE);
     }
 
     @Override
     public void onCreate() {
+        try {
+            super.onCreate();
+        } catch (SecurityException e) {
+        }
         if (mBluetoothAdapter == null) {
             mBluetoothAdapter = bluetoothManager.getAdapter();
         }
@@ -77,21 +82,25 @@ public class BluetoothLEManagerForLOLLIPOP extends BluetoothLEManagerImpl {
     }
 
     @Override
-    public boolean startScan(String[] uuidFilters, ScanCallback scanCallback) {
-        super.startScan(uuidFilters, scanCallback);
+    public boolean startScan(ScannerConfig config) {
+        super.startScan(config);
+        ArrayList<ScanFilter> scanFilters = null;
+        if (config.addresses != null) {
+            scanFilters = new ArrayList<>();
+            for (String address : config.addresses) {
+                final ScanFilter scanFilter = new ScanFilter.Builder().setDeviceAddress(address).build();
+                scanFilters.add(scanFilter);
+            }
+        }
+        return startScan(scanFilters, config);
+    }
+
+    private boolean startScan(ArrayList<ScanFilter> scanFilters, ScannerConfig config) {
         if (mBluetoothAdapter != null && bluetoothLeScanner == null) {
             bluetoothLeScanner = mBluetoothAdapter.getBluetoothLeScanner();
         }
         if (bluetoothLeScanner != null) {
-            ArrayList<ScanFilter> scanFilters = null;
-            if (uuidFilters != null) {
-                scanFilters = new ArrayList<>();
-                for (String uuidFilter : uuidFilters) {
-                    final ScanFilter scanFilter = new ScanFilter.Builder().setServiceUuid(new ParcelUuid(UUID.fromString(uuidFilter))).build();
-                    scanFilters.add(scanFilter);
-                }
-            }
-            final ScanSettings settings = new ScanSettings.Builder().setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY).build();
+            final ScanSettings settings = new ScanSettings.Builder().setScanMode(config.scanMode).build();
             bluetoothLeScanner.startScan(scanFilters, settings, leScanCallback);
             run = true;
         } else {
@@ -101,11 +110,6 @@ public class BluetoothLEManagerForLOLLIPOP extends BluetoothLEManagerImpl {
             }
         }
         return run;
-    }
-
-    @Override
-    public boolean startScan(ScanCallback scanCallback) {
-        return startScan(null, scanCallback);
     }
 
     @Override
@@ -126,6 +130,6 @@ public class BluetoothLEManagerForLOLLIPOP extends BluetoothLEManagerImpl {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        NeetBluetoothLEManager.onDestroy(context);
+        BLEScanner.onDestroy(context);
     }
 }

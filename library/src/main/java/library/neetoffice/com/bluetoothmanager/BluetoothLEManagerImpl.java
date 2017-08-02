@@ -1,14 +1,18 @@
 package library.neetoffice.com.bluetoothmanager;
 
 import android.bluetooth.BluetoothDevice;
+import android.content.Context;
 import android.os.Build;
 import android.os.Handler;
+import android.support.annotation.RequiresPermission;
 import android.util.Log;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -18,14 +22,27 @@ import library.neetoffice.com.bluetoothmanager.device.IBeaconDevice;
 import library.neetoffice.com.bluetoothmanager.device.IBeaconDeviceImpl;
 import library.neetoffice.com.bluetoothmanager.util.IBeaconUtils;
 
+import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
+import static android.Manifest.permission.ACCESS_FINE_LOCATION;
+import static android.Manifest.permission.BLUETOOTH;
+import static android.Manifest.permission.BLUETOOTH_ADMIN;
+
 /**
  * Created by Deo on 2016/4/27.
  */
 public abstract class BluetoothLEManagerImpl implements BluetoothLEManager {
     static final HashMap<String, BluetoothLeDevice> map = new HashMap<>();
+    protected final Context context;
     private final Handler handler = new Handler();
-    private ScanCallback scanCallback;
+    private final List<String> macFilters = new ArrayList<>();
+    private final HashMap<ScanFilter, ScanCallback> callbackHashMap = new HashMap<>();
+    private ScanCallback simpleScanCallback;
     private boolean isStartScan = false;
+    private boolean isLive = false;
+
+    protected BluetoothLEManagerImpl(Context context) {
+        this.context = context;
+    }
 
     @Override
     public Set<BluetoothLeDevice> getBondedDevices() {
@@ -33,65 +50,98 @@ public abstract class BluetoothLEManagerImpl implements BluetoothLEManager {
     }
 
     @Override
-    public boolean startScan(String[] uuidFilters, ScanCallback scanCallback) {
-        this.scanCallback = scanCallback;
-        final long time = Calendar.getInstance().getTimeInMillis();
-        for (Map.Entry<String, BluetoothLeDevice> entry : map.entrySet()) {
-            final BluetoothLeDevice bluetoothLeDevice = entry.getValue();
-            bluetoothLeDevice.updateRssiReading(time, bluetoothLeDevice.getRssi());
-        }
-        if (!isStartScan) {
+    @RequiresPermission(anyOf = {ACCESS_COARSE_LOCATION, ACCESS_FINE_LOCATION, BLUETOOTH, BLUETOOTH_ADMIN})
+    public void onCreate() {
+        if (!isLive) {
+            isLive = true;
             new CheckRemoveTask().start();
+        }
+    }
+
+    @Override
+    public boolean startScan(ScannerConfig config) {
+        synchronized (macFilters) {
+            macFilters.clear();
+            macFilters.addAll(config.addresses);
+        }
+        synchronized (callbackHashMap) {
+            callbackHashMap.clear();
+            callbackHashMap.putAll(config.map);
+        }
+        if (simpleScanCallback != null) {
+            synchronized (simpleScanCallback) {
+                simpleScanCallback = config.simpleScanCallback;
+            }
+        } else {
+            simpleScanCallback = config.simpleScanCallback;
+        }
+        final long time = Calendar.getInstance().getTimeInMillis();
+        synchronized (map) {
+            for (Map.Entry<String, BluetoothLeDevice> entry : map.entrySet()) {
+                final BluetoothLeDevice bluetoothLeDevice = entry.getValue();
+                bluetoothLeDevice.updateRssiReading(time, bluetoothLeDevice.getRssi());
+            }
         }
         isStartScan = true;
         return isStartScan;
     }
 
     @Override
-    public boolean startScan(ScanCallback scanCallback) {
-        return startScan(null, scanCallback);
-    }
-
-    @Override
     public boolean stopScan() {
-        scanCallback = null;
+        if (simpleScanCallback != null) {
+            synchronized (simpleScanCallback) {
+                simpleScanCallback = null;
+            }
+        }
+        synchronized (callbackHashMap) {
+            callbackHashMap.clear();
+        }
         isStartScan = false;
         return !isStartScan;
     }
 
     @Override
     public void onDestroy() {
+        isLive = false;
     }
 
     protected final void postBluetoothLeDevice(BluetoothLeDeviceImpl bluetoothLeDevice) {
         if (bluetoothLeDevice == null) {
             return;
         }
-        Log.d(BluetoothLEManager.class.getSimpleName(), "" + bluetoothLeDevice.getAddress() + "," + bluetoothLeDevice.getRssi());
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-            BluetoothLeDeviceImpl device = null;
-            if (map.containsKey(bluetoothLeDevice.getAddress())) {
-                device = (BluetoothLeDeviceImpl) map.get(bluetoothLeDevice.getAddress());
-                device.updateRssiReading(bluetoothLeDevice.getTimestamp(), bluetoothLeDevice.getRssi());
-                device.updateScanRecord(bluetoothLeDevice.getScanRecord());
-            } else {
-                if (IBeaconUtils.isThisAnIBeacon(bluetoothLeDevice)) {
-                    device = new IBeaconDeviceImpl(bluetoothLeDevice);
-                } else {
-                    device = bluetoothLeDevice;
-                }
-                map.put(bluetoothLeDevice.getAddress(), device);
-            }
-            handler.post(new Task(device));
+        final Map.Entry<ScanFilter, ScanCallback> scanEntry = returnScanEntry(bluetoothLeDevice);
+        final BluetoothLeDevice device;
+        if (map.containsKey(bluetoothLeDevice.getAddress())) {
+            device = map.get(bluetoothLeDevice.getAddress());
+            device.updateRssiReading(bluetoothLeDevice.getTimestamp(), bluetoothLeDevice.getRssi());
+            device.updateScanRecord(bluetoothLeDevice.getScanRecord());
+        } else if (scanEntry != null) {
+            final ScanFilter filter = scanEntry.getKey();
+            device = filter.onSerializable(bluetoothLeDevice);
+            map.put(bluetoothLeDevice.getAddress(), device);
         } else {
-            handler.post(new Task(bluetoothLeDevice));
+            device = bluetoothLeDevice;
+            map.put(bluetoothLeDevice.getAddress(), device);
+        }
+        if (scanEntry != null) {
+            postResultTask(device, scanEntry.getValue());
+        } else if (simpleScanCallback != null) {
+            postResultTask(device, simpleScanCallback);
+        }
+    }
+
+    private void postResultTask(BluetoothLeDevice bluetoothLeDevice, ScanCallback callback) {
+        if (macFilters.isEmpty()) {
+            handler.post(new ResultTask(context, bluetoothLeDevice, callback));
+        } else if (macFilters.contains(bluetoothLeDevice.getAddress())) {
+            handler.post(new ResultTask(context, bluetoothLeDevice, callback));
         }
     }
 
     private class CheckRemoveTask extends Thread {
         @Override
         public void run() {
-            while (isStartScan) {
+            while (isLive) {
                 synchronized (map) {
                     final Iterator<Map.Entry<String, BluetoothLeDevice>> iterator = map.entrySet().iterator();
                     final long nowTime = Calendar.getInstance().getTimeInMillis();
@@ -100,7 +150,12 @@ public abstract class BluetoothLEManagerImpl implements BluetoothLEManager {
                         final BluetoothLeDevice bluetoothLeDevice = entry.getValue();
                         if (nowTime - bluetoothLeDevice.getTimestamp() > BluetoothLeDeviceImpl.LOG_INVALIDATION_THRESHOLD) {
                             iterator.remove();
-                            handler.post(new LostTask(bluetoothLeDevice));
+                            final Map.Entry<ScanFilter, ScanCallback> scanEntry = returnScanEntry(bluetoothLeDevice);
+                            if (scanEntry != null) {
+                                handler.post(new LostTask(context, bluetoothLeDevice, scanEntry.getValue()));
+                            } else if (simpleScanCallback != null) {
+                                handler.post(new LostTask(context, bluetoothLeDevice, simpleScanCallback));
+                            }
                         }
                     }
                 }
@@ -112,49 +167,17 @@ public abstract class BluetoothLEManagerImpl implements BluetoothLEManager {
         }
     }
 
-    private class LostTask implements Runnable {
-        private final BluetoothLeDevice bluetoothLeDevice;
-
-        private LostTask(BluetoothLeDevice bluetoothLeDevice) {
-            this.bluetoothLeDevice = bluetoothLeDevice;
-        }
-
-        @Override
-        public void run() {
-            if (scanCallback != null) {
-                synchronized (scanCallback) {
-                    if (bluetoothLeDevice instanceof IBeaconDevice) {
-                        final IBeaconDevice iBeaconDevice = (IBeaconDevice) bluetoothLeDevice;
-                        scanCallback.onLost(iBeaconDevice);
-                    } else {
-                        scanCallback.onLost(bluetoothLeDevice);
-                    }
+    private Map.Entry<ScanFilter, ScanCallback> returnScanEntry(BluetoothLeDevice bluetoothLeDevice) {
+        Map.Entry<ScanFilter, ScanCallback> entry = null;
+        synchronized (callbackHashMap) {
+            for (Map.Entry<ScanFilter, ScanCallback> e : callbackHashMap.entrySet()) {
+                final ScanFilter filter = e.getKey();
+                if (filter.filter(bluetoothLeDevice)) {
+                    entry = e;
+                    break;
                 }
             }
         }
-    }
-
-    private class Task implements Runnable {
-        private final BluetoothLeDevice bluetoothLeDevice;
-
-        private Task(BluetoothLeDevice bluetoothLeDevice) {
-            this.bluetoothLeDevice = bluetoothLeDevice;
-        }
-
-        @Override
-        public void run() {
-            if (scanCallback != null) {
-                synchronized (scanCallback) {
-                    if (bluetoothLeDevice != null) {
-                        if (bluetoothLeDevice instanceof IBeaconDevice) {
-                            final IBeaconDevice iBeaconDevice = (IBeaconDevice) bluetoothLeDevice;
-                            scanCallback.onScanResult(iBeaconDevice);
-                        } else {
-                            scanCallback.onScanResult(bluetoothLeDevice);
-                        }
-                    }
-                }
-            }
-        }
+        return entry;
     }
 }

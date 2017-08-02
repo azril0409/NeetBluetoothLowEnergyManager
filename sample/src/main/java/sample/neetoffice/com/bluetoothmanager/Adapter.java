@@ -54,7 +54,7 @@ public class Adapter extends GenericAdapter<BluetoothModel, Tag> {
         if (bluetoothModel.bluetoothDevice != null) {
             final BluetoothDevice bluetoothDevice = bluetoothModel.bluetoothDevice;
             tag.library_mac_textView.setText(getString(R.string.library_mac_text, bluetoothDevice.getAddress()));
-            tag.library_uuid_textView.setText("");
+            tag.library_uuid_textView.setText(""+bluetoothDevice.getUuids().length);
             tag.library_median_rssi_textView.setText("");
             tag.library_average_rssi_textView.setText("");
             tag.library_major_textView.setText("");

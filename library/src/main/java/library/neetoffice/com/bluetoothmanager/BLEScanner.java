@@ -8,19 +8,19 @@ import java.util.HashMap;
 /**
  * Created by Deo-chainmeans on 2015/10/8.
  */
-public abstract class NeetBluetoothLEManager {
-    private static final HashMap<String, BluetoothLEManager> bluetoothLEManagers = new HashMap<>();
+public abstract class BLEScanner {
+    private static final HashMap<Integer, BluetoothLEManager> bluetoothLEManagers = new HashMap<>();
 
     public static final BluetoothLEManager getInstance(Context context) {
-        if (bluetoothLEManagers.containsKey(context.getClass().getName())) {
-            return bluetoothLEManagers.get(context.getClass().getName());
+        if (bluetoothLEManagers.containsKey(context.hashCode())) {
+            return bluetoothLEManagers.get(context.hashCode());
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             final BluetoothLEManager bluetoothManager = new BluetoothLEManagerForLOLLIPOP(context);
-            bluetoothLEManagers.put(context.getClass().getName(), bluetoothManager);
+            bluetoothLEManagers.put(context.hashCode(), bluetoothManager);
             return bluetoothManager;
         } else {
             final BluetoothLEManager bluetoothManager = new BluetoothLEManagerForJB2(context);
-            bluetoothLEManagers.put(context.getClass().getName(), bluetoothManager);
+            bluetoothLEManagers.put(context.hashCode(), bluetoothManager);
             return bluetoothManager;
         }
     }

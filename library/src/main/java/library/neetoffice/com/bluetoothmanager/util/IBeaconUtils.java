@@ -67,10 +67,6 @@ public class IBeaconUtils {
         return Math.pow(10d, ((double) txPower - rssi) / (10 * coefficient));
     }
 
-    public static void main(String[] args){
-        System.out.println(""+calculateDistance(0,-61,4));
-    }
-
 
     /**
      * Ascertains whether a {@link BluetoothLeDevice} is an iBeacon;

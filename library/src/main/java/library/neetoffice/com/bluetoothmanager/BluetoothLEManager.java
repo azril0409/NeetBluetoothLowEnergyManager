@@ -20,9 +20,7 @@ public interface BluetoothLEManager {
 
     Set<BluetoothLeDevice> getBondedDevices();
 
-    boolean startScan(String[] uuidFilters, ScanCallback scanCallback);
-
-    boolean startScan(ScanCallback scanCallback);
+    boolean startScan(ScannerConfig config);
 
     boolean stopScan();
 
