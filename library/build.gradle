@@ -30,7 +30,7 @@ task clearAar(type: Delete) {
     delete '../librarys/'
 }
 task makeAar(type: Copy) {
-    from('build/intermediates/bundles/default/')
+    from('build/intermediates/bundles/release/')
     into('../librarys/')
     include('classes.jar')
     include('jni/**')

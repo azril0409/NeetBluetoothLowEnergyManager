@@ -29,11 +29,6 @@ public class ScannerConfig {
         this.simpleScanCallback = simpleScanCallback;
     }
 
-
-    public static Builder builder() {
-        return new Builder();
-    }
-
     public static class Builder {
         private int scanMode;
         private HashSet<String> addresses = new HashSet<>();
