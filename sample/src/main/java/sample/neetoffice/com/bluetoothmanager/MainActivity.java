@@ -23,7 +23,7 @@ import library.neetoffice.com.bluetoothmanager.SimpleFilter;
 import library.neetoffice.com.bluetoothmanager.device.BluetoothLeDevice;
 import library.neetoffice.com.bluetoothmanager.device.IBeaconDevice;
 
-public class MainActivity extends AppCompatActivity implements ScanCallback<BluetoothLeDevice>, AdapterView.OnItemClickListener {
+public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
     ListView listView;
     BluetoothLEManager manager;
     Adapter adapter = new Adapter(this);
@@ -66,9 +66,9 @@ public class MainActivity extends AppCompatActivity implements ScanCallback<Blue
         super.onResume();
         final ScannerConfig config;
         if (device == null) {
-            config = new ScannerConfig.Builder().addScanFilter(new IBeaconFilter(), this).addScanFilter(new SimpleFilter(), this).build();
+            config = new ScannerConfig.Builder().addScanFilter(new IBeaconFilter(), iBeaconCallback).addScanFilter(new SimpleFilter(), simpleCallback).build();
         } else {
-            config = new ScannerConfig.Builder().setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY).setBluetoothLeDevice(device).addScanFilter(new IBeaconFilter(), this).addScanFilter(new SimpleFilter(), this).build();
+            config = new ScannerConfig.Builder().setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY).setBluetoothLeDevice(device).addScanFilter(new IBeaconFilter(), iBeaconCallback).addScanFilter(new SimpleFilter(), simpleCallback).build();
         }
         manager.startScan(config);
     }
@@ -85,21 +85,40 @@ public class MainActivity extends AppCompatActivity implements ScanCallback<Blue
         super.onDestroy();
     }
 
-    @Override
-    public void onScanResult(BluetoothLeDevice bluetoothLeDevice) {
-        if (arrayMap.containsKey(bluetoothLeDevice.getAddress())) {
-            adapter.notifyDataSetChanged();
-        } else {
-            arrayMap.put(bluetoothLeDevice.getAddress(), new BluetoothModel(bluetoothLeDevice));
+    final ScanCallback<BluetoothLeDevice> simpleCallback = new ScanCallback<BluetoothLeDevice>() {
+        @Override
+        public void onScanResult(BluetoothLeDevice bluetoothLeDevice) {
+            if (arrayMap.containsKey(bluetoothLeDevice.getAddress())) {
+                adapter.notifyDataSetChanged();
+            } else {
+                arrayMap.put(bluetoothLeDevice.getAddress(), new BluetoothModel(bluetoothLeDevice));
+                adapter.setAll(arrayMap.values());
+            }
+        }
+
+        @Override
+        public void onLost(BluetoothLeDevice bluetoothLeDevice) {
+            arrayMap.remove(bluetoothLeDevice.getAddress());
             adapter.setAll(arrayMap.values());
         }
-    }
+    };
+    final ScanCallback<IBeaconDevice> iBeaconCallback = new ScanCallback<IBeaconDevice>() {
+        @Override
+        public void onScanResult(IBeaconDevice iBeaconDevice) {
+            if (arrayMap.containsKey(iBeaconDevice.getAddress())) {
+                adapter.notifyDataSetChanged();
+            } else {
+                arrayMap.put(iBeaconDevice.getAddress(), new BluetoothModel(iBeaconDevice));
+                adapter.setAll(arrayMap.values());
+            }
+        }
 
-    @Override
-    public void onLost(BluetoothLeDevice bluetoothLeDevice) {
-        arrayMap.remove(bluetoothLeDevice.getAddress());
-        adapter.setAll(arrayMap.values());
-    }
+        @Override
+        public void onLost(IBeaconDevice iBeaconDevice) {
+            arrayMap.remove(iBeaconDevice.getAddress());
+            adapter.setAll(arrayMap.values());
+        }
+    };
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {

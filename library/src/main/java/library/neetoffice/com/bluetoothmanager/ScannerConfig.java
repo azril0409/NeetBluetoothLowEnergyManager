@@ -30,7 +30,7 @@ public class ScannerConfig {
     }
 
 
-    public static Builder Builder() {
+    public static Builder builder() {
         return new Builder();
     }
 
@@ -66,7 +66,7 @@ public class ScannerConfig {
             return this;
         }
 
-        public Builder addScanFilter(ScanFilter<? extends BluetoothLeDevice> scanFilter, ScanCallback<? extends BluetoothLeDevice> scanCallback) {
+        public <T extends BluetoothLeDevice> Builder addScanFilter(ScanFilter<T> scanFilter, ScanCallback<T> scanCallback) {
             if (scanFilter instanceof SimpleFilter) {
                 simpleScanCallback = scanCallback;
             } else {
