@@ -4,7 +4,6 @@ import android.Manifest;
 import android.bluetooth.le.ScanSettings;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -17,7 +16,7 @@ import android.widget.ListView;
 import library.neetoffice.com.bluetoothmanager.IBeaconFilter;
 import library.neetoffice.com.bluetoothmanager.ScannerConfig;
 import library.neetoffice.com.bluetoothmanager.BluetoothLEManager;
-import library.neetoffice.com.bluetoothmanager.BLEScanner;
+import library.neetoffice.com.bluetoothmanager.BluetoothLEScanner;
 import library.neetoffice.com.bluetoothmanager.ScanCallback;
 import library.neetoffice.com.bluetoothmanager.SimpleFilter;
 import library.neetoffice.com.bluetoothmanager.device.BluetoothLeDevice;
@@ -38,7 +37,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(this);
         device = getIntent().getParcelableExtra("BLE");
-        manager = BLEScanner.getInstance(this);
+        manager = BluetoothLEScanner.getInstance(this);
         if (checkSelfPermission()) {
             manager.onCreate();
         }

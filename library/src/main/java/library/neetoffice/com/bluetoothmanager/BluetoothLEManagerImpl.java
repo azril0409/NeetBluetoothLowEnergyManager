@@ -26,6 +26,7 @@ import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 import static android.Manifest.permission.BLUETOOTH;
 import static android.Manifest.permission.BLUETOOTH_ADMIN;
+import static library.neetoffice.com.bluetoothmanager.device.BluetoothLeDeviceImpl.LOG_INVALIDATION_THRESHOLD;
 
 /**
  * Created by Deo on 2016/4/27.
@@ -131,9 +132,7 @@ public abstract class BluetoothLEManagerImpl implements BluetoothLEManager {
     }
 
     private void postResultTask(BluetoothLeDevice bluetoothLeDevice, ScanCallback callback) {
-        if (macFilters.isEmpty()) {
-            handler.post(new ResultTask(context, bluetoothLeDevice, callback));
-        } else if (macFilters.contains(bluetoothLeDevice.getAddress())) {
+        if (macFilters.isEmpty() || macFilters.contains(bluetoothLeDevice.getAddress())) {
             handler.post(new ResultTask(context, bluetoothLeDevice, callback));
         }
     }
@@ -146,21 +145,20 @@ public abstract class BluetoothLEManagerImpl implements BluetoothLEManager {
                     final Iterator<Map.Entry<String, BluetoothLeDevice>> iterator = map.entrySet().iterator();
                     final long nowTime = Calendar.getInstance().getTimeInMillis();
                     while (iterator.hasNext()) {
-                        final Map.Entry<String, BluetoothLeDevice> entry = iterator.next();
-                        final BluetoothLeDevice bluetoothLeDevice = entry.getValue();
-                        if (nowTime - bluetoothLeDevice.getTimestamp() > BluetoothLeDeviceImpl.LOG_INVALIDATION_THRESHOLD) {
+                        final BluetoothLeDevice device = iterator.next().getValue();
+                        if (nowTime - device.getTimestamp() > LOG_INVALIDATION_THRESHOLD) {
                             iterator.remove();
-                            final Map.Entry<ScanFilter, ScanCallback> scanEntry = returnScanEntry(bluetoothLeDevice);
+                            final Map.Entry<ScanFilter, ScanCallback> scanEntry = returnScanEntry(device);
                             if (scanEntry != null) {
-                                handler.post(new LostTask(context, bluetoothLeDevice, scanEntry.getValue()));
+                                handler.post(new LostTask(context, device, scanEntry.getValue()));
                             } else if (simpleScanCallback != null) {
-                                handler.post(new LostTask(context, bluetoothLeDevice, simpleScanCallback));
+                                handler.post(new LostTask(context, device, simpleScanCallback));
                             }
                         }
                     }
                 }
                 try {
-                    Thread.sleep(BluetoothLeDeviceImpl.LOG_INVALIDATION_THRESHOLD / 2);
+                    Thread.sleep(LOG_INVALIDATION_THRESHOLD / 2);
                 } catch (InterruptedException e) {
                 }
             }

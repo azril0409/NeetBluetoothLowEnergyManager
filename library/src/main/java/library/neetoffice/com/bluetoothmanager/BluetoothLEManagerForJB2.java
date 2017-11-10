@@ -36,11 +36,8 @@ public class BluetoothLEManagerForJB2 extends BluetoothLEManagerImpl {
     }
 
     @Override
-    public void onCreate() {
-        try {
-            super.onCreate();
-        } catch (SecurityException e) {
-        }
+    public void onCreate() throws SecurityException {
+        super.onCreate();
         if (mBluetoothAdapter == null) {
             mBluetoothAdapter = bluetoothManager.getAdapter();
         }
@@ -79,6 +76,6 @@ public class BluetoothLEManagerForJB2 extends BluetoothLEManagerImpl {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        BLEScanner.onDestroy(context);
+        BluetoothLEScanner.onDestroy(context);
     }
 }

@@ -11,7 +11,6 @@ import android.bluetooth.le.ScanSettings;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
-import android.support.annotation.RequiresPermission;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -19,11 +18,6 @@ import java.util.Calendar;
 import java.util.List;
 
 import library.neetoffice.com.bluetoothmanager.device.BluetoothLeDeviceImpl;
-
-import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
-import static android.Manifest.permission.ACCESS_FINE_LOCATION;
-import static android.Manifest.permission.BLUETOOTH;
-import static android.Manifest.permission.BLUETOOTH_ADMIN;
 
 
 /**
@@ -66,17 +60,13 @@ public class BluetoothLEManagerForLOLLIPOP extends BluetoothLEManagerImpl {
     }
 
     @Override
-    public void onCreate() {
-        try {
-            super.onCreate();
-        } catch (SecurityException e) {
-        }
+    public void onCreate() throws SecurityException {
+        super.onCreate();
         if (mBluetoothAdapter == null) {
             mBluetoothAdapter = bluetoothManager.getAdapter();
         }
-        if (mBluetoothAdapter != null || !mBluetoothAdapter.isEnabled()) {
+        if (mBluetoothAdapter == null || !mBluetoothAdapter.isEnabled()) {
             final Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(intent);
         }
     }
@@ -130,6 +120,6 @@ public class BluetoothLEManagerForLOLLIPOP extends BluetoothLEManagerImpl {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        BLEScanner.onDestroy(context);
+        BluetoothLEScanner.onDestroy(context);
     }
 }

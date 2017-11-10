@@ -8,7 +8,7 @@ import java.util.HashMap;
 /**
  * Created by Deo-chainmeans on 2015/10/8.
  */
-public abstract class BLEScanner {
+public abstract class BluetoothLEScanner {
     private static final HashMap<Integer, BluetoothLEManager> bluetoothLEManagers = new HashMap<>();
 
     public static final BluetoothLEManager getInstance(Context context) {
@@ -26,7 +26,7 @@ public abstract class BLEScanner {
     }
 
     static void onDestroy(Context context) {
-        bluetoothLEManagers.remove(context.getClass().getName());
+        bluetoothLEManagers.remove(context.hashCode());
         if (bluetoothLEManagers.isEmpty()) {
             BluetoothLEManagerImpl.map.clear();
         }
