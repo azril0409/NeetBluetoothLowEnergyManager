@@ -6,7 +6,8 @@ import android.os.Parcelable;
 
 import java.util.Map;
 
-import library.neetoffice.com.bluetoothmanager.device.adrecord.AdRecordStore;
+import uk.co.alt236.bluetoothlelib.device.adrecord.AdRecordStore;
+
 
 // TODO: Auto-generated Javadoc
 

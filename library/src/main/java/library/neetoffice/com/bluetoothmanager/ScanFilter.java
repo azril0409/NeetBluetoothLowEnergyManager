@@ -13,5 +13,5 @@ import library.neetoffice.com.bluetoothmanager.device.BluetoothLeDevice;
 public abstract class ScanFilter<T extends BluetoothLeDevice> implements Serializable {
     public abstract boolean filter(BluetoothLeDevice bluetoothLeDevice);
 
-    public abstract T onSerializable(BluetoothLeDevice bluetoothLeDevice);
+    public abstract T onReEncapsulation(BluetoothLeDevice bluetoothLeDevice);
 }

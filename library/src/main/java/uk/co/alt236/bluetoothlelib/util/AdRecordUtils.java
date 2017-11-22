@@ -1,4 +1,7 @@
-package library.neetoffice.com.bluetoothmanager.util;
+package uk.co.alt236.bluetoothlelib.util;
+
+import android.annotation.SuppressLint;
+import android.util.SparseArray;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -7,16 +10,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import android.annotation.SuppressLint;
-import android.util.SparseArray;
+import uk.co.alt236.bluetoothlelib.device.adrecord.AdRecord;
 
-import library.neetoffice.com.bluetoothmanager.device.adrecord.AdRecord;
+public final class AdRecordUtils {
 
-public class AdRecordUtils {
+    private AdRecordUtils(){
+        // TO AVOID INSTANTIATION
+    }
 
     public static String getRecordDataAsString(final AdRecord nameRecord) {
         if (nameRecord == null) {
-            return new String();
+            return "";
         }
         return new String(nameRecord.getData());
     }
@@ -50,7 +54,7 @@ public class AdRecordUtils {
      * Read out all the AD structures from the raw scan record
      */
     public static List<AdRecord> parseScanRecordAsList(final byte[] scanRecord) {
-        final List<AdRecord> records = new ArrayList<AdRecord>();
+        final List<AdRecord> records = new ArrayList<>();
 
         int index = 0;
         while (index < scanRecord.length) {
@@ -76,7 +80,7 @@ public class AdRecordUtils {
 
     @SuppressLint("UseSparseArrays")
     public static Map<Integer, AdRecord> parseScanRecordAsMap(final byte[] scanRecord) {
-        final Map<Integer, AdRecord> records = new HashMap<Integer, AdRecord>();
+        final Map<Integer, AdRecord> records = new HashMap<>();
 
         int index = 0;
         while (index < scanRecord.length) {
@@ -100,8 +104,8 @@ public class AdRecordUtils {
         return Collections.unmodifiableMap(records);
     }
 
-    public static SparseArray<AdRecord> parseScanRecordAsSparseArray(byte[] scanRecord) {
-        final SparseArray<AdRecord> records = new SparseArray<AdRecord>();
+    public static SparseArray<AdRecord> parseScanRecordAsSparseArray(final byte[] scanRecord) {
+        final SparseArray<AdRecord> records = new SparseArray<>();
 
         int index = 0;
         while (index < scanRecord.length) {

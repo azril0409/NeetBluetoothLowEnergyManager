@@ -1,4 +1,4 @@
-package library.neetoffice.com.bluetoothmanager.util;
+package uk.co.alt236.bluetoothlelib.util;
 
 import java.nio.ByteBuffer;
 
@@ -9,6 +9,10 @@ public class ByteUtils {
      */
     private static final String HEXES = "0123456789ABCDEF";
 
+    private ByteUtils(){
+        // TO AVOID INSTANTIATION
+    }
+
     /**
      * Gets a pretty representation of a Byte Array as a HEX String.
      * <p>
@@ -17,8 +21,8 @@ public class ByteUtils {
      * @param array the array
      * @return the string
      */
-    public static String byteArrayToHexString(final byte... array) {
-        final StringBuffer sb = new StringBuffer();
+    public static String byteArrayToHexString(final byte[] array) {
+        final StringBuilder sb = new StringBuilder();
         boolean firstEntry = true;
         sb.append('[');
 
@@ -36,13 +40,13 @@ public class ByteUtils {
     }
 
     /**
-     * Checks to see if a byte arry starts with another byte array.
+     * Checks to see if a byte array starts with another byte array.
      *
      * @param array  the array
      * @param prefix the prefix
      * @return true, if successful
      */
-    public static boolean doesArrayBeginWith(byte[] array, byte[] prefix) {
+    public static boolean doesArrayBeginWith(final byte[] array, final byte[] prefix) {
         if (array.length < prefix.length) {
             return false;
         }
@@ -62,7 +66,7 @@ public class ByteUtils {
      * @param input the input
      * @return the int from the array
      */
-    public static int getIntFrom2ByteArray(byte[] input) {
+    public static int getIntFrom2ByteArray(final byte[] input) {
         final byte[] result = new byte[4];
 
         result[0] = 0;
@@ -78,11 +82,11 @@ public class ByteUtils {
      * <p>
      * For example, FF will be converted to 255 and not -1.
      *
-     * @param bite the bite
+     * @param bite the byte
      * @return the int from byte
      */
     public static int getIntFromByte(final byte bite) {
-        return Integer.valueOf(bite & 0xFF);
+        return bite & 0xFF;
     }
 
     /**
@@ -107,12 +111,11 @@ public class ByteUtils {
 
 
     /**
-     * Inverts an array
+     * Inverts an byte array in place.
      *
      * @param array the array
-     * @return the byte[]
      */
-    public static byte[] invertArray(byte[] array) {
+    public static void invertArray(final byte[] array) {
         final int size = array.length;
         byte temp;
 
@@ -121,14 +124,5 @@ public class ByteUtils {
             array[i] = array[size - 1 - i];
             array[size - 1 - i] = temp;
         }
-
-        return array;
-    }
-
-    public static byte[] sub(byte[] scanRecord, int beginIndex, int endIndex) {
-        final int length = endIndex - beginIndex;
-        byte[] bytes = new byte[length];
-        System.arraycopy(scanRecord, beginIndex, bytes, 0, length);
-        return bytes;
     }
 }

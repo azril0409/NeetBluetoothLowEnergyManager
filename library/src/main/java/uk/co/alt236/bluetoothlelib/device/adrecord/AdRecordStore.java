@@ -1,35 +1,34 @@
-package library.neetoffice.com.bluetoothmanager.device.adrecord;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
+package uk.co.alt236.bluetoothlelib.device.adrecord;
 
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.SparseArray;
 
-import library.neetoffice.com.bluetoothmanager.util.AdRecordUtils;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+
+import uk.co.alt236.bluetoothlelib.util.AdRecordUtils;
 
 /**
  * The Class AdRecordStore.
  */
 public class AdRecordStore implements Parcelable {
+    public static final Creator<AdRecordStore> CREATOR = new Creator<AdRecordStore>() {
+        public AdRecordStore createFromParcel(final Parcel in) {
+            return new AdRecordStore(in);
+        }
+
+        public AdRecordStore[] newArray(final int size) {
+            return new AdRecordStore[size];
+        }
+    };
     private final SparseArray<AdRecord> mAdRecords;
     private final String mLocalNameComplete;
     private final String mLocalNameShort;
 
-    public static final Creator<AdRecordStore> CREATOR = new Creator<AdRecordStore>() {
-        public AdRecordStore createFromParcel(Parcel in) {
-            return new AdRecordStore(in);
-        }
-
-        public AdRecordStore[] newArray(int size) {
-            return new AdRecordStore[size];
-        }
-    };
-
-    public AdRecordStore(Parcel in) {
+    public AdRecordStore(final Parcel in) {
         final Bundle b = in.readBundle(getClass().getClassLoader());
         mAdRecords = b.getSparseParcelableArray("records_array");
         mLocalNameComplete = b.getString("local_name_complete");
@@ -43,8 +42,13 @@ public class AdRecordStore implements Parcelable {
      */
     public AdRecordStore(final SparseArray<AdRecord> adRecords) {
         mAdRecords = adRecords;
-        mLocalNameComplete = AdRecordUtils.getRecordDataAsString(mAdRecords.get(AdRecord.TYPE_LOCAL_NAME_COMPLETE));
-        mLocalNameShort = AdRecordUtils.getRecordDataAsString(mAdRecords.get(AdRecord.TYPE_LOCAL_NAME_SHORT));
+
+        mLocalNameComplete = AdRecordUtils.getRecordDataAsString(
+                mAdRecords.get(AdRecord.TYPE_LOCAL_NAME_COMPLETE));
+
+        mLocalNameShort = AdRecordUtils.getRecordDataAsString(
+                mAdRecords.get(AdRecord.TYPE_LOCAL_NAME_SHORT));
+
     }
 
     /* (non-Javadoc)
@@ -79,7 +83,7 @@ public class AdRecordStore implements Parcelable {
      * @param record the record
      * @return the record
      */
-    public AdRecord getRecord(int record) {
+    public AdRecord getRecord(final int record) {
         return mAdRecords.get(record);
     }
 
@@ -89,7 +93,7 @@ public class AdRecordStore implements Parcelable {
      * @param record the record
      * @return the record data as string
      */
-    public String getRecordDataAsString(int record) {
+    public String getRecordDataAsString(final int record) {
         return AdRecordUtils.getRecordDataAsString(
                 mAdRecords.get(record));
     }
@@ -109,7 +113,7 @@ public class AdRecordStore implements Parcelable {
      * @param record the record
      * @return true, if is record present
      */
-    public boolean isRecordPresent(int record) {
+    public boolean isRecordPresent(final int record) {
         return mAdRecords.indexOfKey(record) >= 0;
     }
 
@@ -125,7 +129,7 @@ public class AdRecordStore implements Parcelable {
      * @see android.os.Parcelable#writeToParcel(android.os.Parcel, int)
      */
     @Override
-    public void writeToParcel(Parcel parcel, int arg1) {
+    public void writeToParcel(final Parcel parcel, final int arg1) {
         final Bundle b = new Bundle();
         b.putString("local_name_complete", mLocalNameComplete);
         b.putString("local_name_short", mLocalNameShort);
@@ -141,10 +145,10 @@ public class AdRecordStore implements Parcelable {
      * @param sparseArray the sparse array
      * @return the collection
      */
-    public static <C> Collection<C> asList(SparseArray<C> sparseArray) {
+    public static <C> Collection<C> asList(final SparseArray<C> sparseArray) {
         if (sparseArray == null) return null;
 
-        final Collection<C> arrayList = new ArrayList<C>(sparseArray.size());
+        final Collection<C> arrayList = new ArrayList<>(sparseArray.size());
         for (int i = 0; i < sparseArray.size(); i++) {
             arrayList.add(sparseArray.valueAt(i));
         }

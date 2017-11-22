@@ -13,11 +13,11 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Map;
 
-import library.neetoffice.com.bluetoothmanager.device.adrecord.AdRecordStore;
 import library.neetoffice.com.bluetoothmanager.resolvers.BluetoothClassResolver;
-import library.neetoffice.com.bluetoothmanager.util.AdRecordUtils;
-import library.neetoffice.com.bluetoothmanager.util.ByteUtils;
 import library.neetoffice.com.bluetoothmanager.util.LimitedLinkHashMap;
+import uk.co.alt236.bluetoothlelib.device.adrecord.AdRecordStore;
+import uk.co.alt236.bluetoothlelib.util.AdRecordUtils;
+import uk.co.alt236.bluetoothlelib.util.ByteUtils;
 
 /**
  * Created by Deo-chainmeans on 2016/9/10.

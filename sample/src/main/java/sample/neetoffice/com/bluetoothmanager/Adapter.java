@@ -13,9 +13,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import library.chainmeans.com.scanner.support.ibeacon.IBeaconDevice;
+import library.chainmeans.com.scanner.support.ibeacon.IBeaconUtil;
 import library.neetoffice.com.bluetoothmanager.device.BluetoothLeDevice;
-import library.neetoffice.com.bluetoothmanager.device.IBeaconDevice;
-import library.neetoffice.com.bluetoothmanager.util.IBeaconUtils;
 import library.neetoffice.com.genericadapter.base.GenericAdapter;
 import sample.neetoffice.com.bluetoothmanager.utils.HeartHandRingUtil;
 import sample.neetoffice.com.bluetoothmanager.utils.NordicUtil;
@@ -109,12 +109,12 @@ public class Adapter extends GenericAdapter<BluetoothModel, Tag> {
             tag.library_minor_textView.setText(getString(R.string.library_minor_text, iBeaconDevice.getMinor()));
             tag.library_timestamp_textView.setText(getString(R.string.library_timestamp_text, DATEFORMAT.format(new Date(iBeaconDevice.getTimestamp()))));
             tag.library_calibratedtxpower_textView.setText(getString(R.string.library_calibratedtxpower_text, iBeaconDevice.getCalibratedTxPower()));
-            tag.library_descriptor_textView_m.setText(getString(R.string.library_distance_text, FORMAT.format(IBeaconUtils.calculateDistance(iBeaconDevice.getCalibratedTxPower(), iBeaconDevice.getRunningMedianRssi(), 5))));
-            tag.library_distance_textView_m.setText(getString(R.string.library_descriptor_text, IBeaconUtils.getDistanceDescriptor(IBeaconUtils.calculateAccuracy(iBeaconDevice.getCalibratedTxPower(), iBeaconDevice.getRunningMedianRssi()))));
-            tag.library_accuracy_textView_m.setText(getString(R.string.library_accuracy_text, FORMAT.format(IBeaconUtils.calculateAccuracy(iBeaconDevice.getCalibratedTxPower(), iBeaconDevice.getRunningMedianRssi()))));
-            tag.library_descriptor_textView_a.setText(getString(R.string.library_distance_text, FORMAT.format(IBeaconUtils.calculateDistance(iBeaconDevice.getCalibratedTxPower(), iBeaconDevice.getRunningAverageRssi(), 5))));
-            tag.library_distance_textView_a.setText(getString(R.string.library_descriptor_text, IBeaconUtils.getDistanceDescriptor(IBeaconUtils.calculateAccuracy(iBeaconDevice.getCalibratedTxPower(), iBeaconDevice.getRunningAverageRssi()))));
-            tag.library_accuracy_textView_a.setText(getString(R.string.library_accuracy_text, FORMAT.format(IBeaconUtils.calculateAccuracy(iBeaconDevice.getCalibratedTxPower(), iBeaconDevice.getRunningAverageRssi()))));
+            tag.library_descriptor_textView_m.setText(getString(R.string.library_distance_text, FORMAT.format(IBeaconUtil.calculateDistance(iBeaconDevice.getCalibratedTxPower(), iBeaconDevice.getRunningMedianRssi(), 5))));
+            tag.library_distance_textView_m.setText(getString(R.string.library_descriptor_text, IBeaconUtil.getDistanceDescriptor(IBeaconUtil.calculateAccuracy(iBeaconDevice.getCalibratedTxPower(), iBeaconDevice.getRunningMedianRssi()))));
+            tag.library_accuracy_textView_m.setText(getString(R.string.library_accuracy_text, FORMAT.format(IBeaconUtil.calculateAccuracy(iBeaconDevice.getCalibratedTxPower(), iBeaconDevice.getRunningMedianRssi()))));
+            tag.library_descriptor_textView_a.setText(getString(R.string.library_distance_text, FORMAT.format(IBeaconUtil.calculateDistance(iBeaconDevice.getCalibratedTxPower(), iBeaconDevice.getRunningAverageRssi(), 5))));
+            tag.library_distance_textView_a.setText(getString(R.string.library_descriptor_text, IBeaconUtil.getDistanceDescriptor(IBeaconUtil.calculateAccuracy(iBeaconDevice.getCalibratedTxPower(), iBeaconDevice.getRunningAverageRssi()))));
+            tag.library_accuracy_textView_a.setText(getString(R.string.library_accuracy_text, FORMAT.format(IBeaconUtil.calculateAccuracy(iBeaconDevice.getCalibratedTxPower(), iBeaconDevice.getRunningAverageRssi()))));
         }
     }
 

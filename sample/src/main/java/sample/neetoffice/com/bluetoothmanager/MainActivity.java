@@ -13,14 +13,14 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import library.neetoffice.com.bluetoothmanager.IBeaconFilter;
+import library.chainmeans.com.scanner.support.ibeacon.IBeaconDevice;
+import library.chainmeans.com.scanner.support.ibeacon.IBeaconFilter;
 import library.neetoffice.com.bluetoothmanager.ScannerConfig;
 import library.neetoffice.com.bluetoothmanager.BluetoothLEManager;
 import library.neetoffice.com.bluetoothmanager.BluetoothLEScanner;
 import library.neetoffice.com.bluetoothmanager.ScanCallback;
 import library.neetoffice.com.bluetoothmanager.SimpleFilter;
 import library.neetoffice.com.bluetoothmanager.device.BluetoothLeDevice;
-import library.neetoffice.com.bluetoothmanager.device.IBeaconDevice;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
     ListView listView;

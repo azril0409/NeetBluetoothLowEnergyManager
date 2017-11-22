@@ -1,9 +1,13 @@
-package library.neetoffice.com.bluetoothmanager.device;
+package library.chainmeans.com.scanner.support.ibeacon;
 
 import android.os.Parcel;
 
-import library.neetoffice.com.bluetoothmanager.device.mfdata.IBeaconManufacturerData;
-import library.neetoffice.com.bluetoothmanager.util.IBeaconUtils;
+import library.neetoffice.com.bluetoothmanager.device.BluetoothLeDevice;
+
+
+/**
+ * Created by Deo-chainmeans on 2017/11/20.
+ */
 
 public interface IBeaconDevice extends BluetoothLeDevice {
     Creator<IBeaconDevice> CREATOR = new Creator<IBeaconDevice>() {
@@ -53,7 +57,7 @@ public interface IBeaconDevice extends BluetoothLeDevice {
      *
      * @return the distance descriptor
      */
-    IBeaconUtils.IBeaconDistanceDescriptor getDistanceDescriptor(float coefficient);
+    IBeaconDistanceDescriptor getDistanceDescriptor();
 
     /**
      * Gets the iBeacon manufacturing data.
@@ -89,5 +93,4 @@ public interface IBeaconDevice extends BluetoothLeDevice {
      * @return the UUID
      */
     String getUUID();
-
 }

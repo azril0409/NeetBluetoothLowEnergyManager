@@ -2,8 +2,8 @@ package sample.neetoffice.com.bluetoothmanager;
 
 import android.bluetooth.BluetoothDevice;
 
+import library.chainmeans.com.scanner.support.ibeacon.IBeaconDevice;
 import library.neetoffice.com.bluetoothmanager.device.BluetoothLeDevice;
-import library.neetoffice.com.bluetoothmanager.device.IBeaconDevice;
 
 /**
  * Created by Deo on 2016/4/27.

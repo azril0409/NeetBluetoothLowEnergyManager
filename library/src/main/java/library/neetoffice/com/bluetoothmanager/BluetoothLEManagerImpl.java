@@ -18,9 +18,6 @@ import java.util.Set;
 
 import library.neetoffice.com.bluetoothmanager.device.BluetoothLeDevice;
 import library.neetoffice.com.bluetoothmanager.device.BluetoothLeDeviceImpl;
-import library.neetoffice.com.bluetoothmanager.device.IBeaconDevice;
-import library.neetoffice.com.bluetoothmanager.device.IBeaconDeviceImpl;
-import library.neetoffice.com.bluetoothmanager.util.IBeaconUtils;
 
 import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
@@ -118,7 +115,7 @@ public abstract class BluetoothLEManagerImpl implements BluetoothLEManager {
             device.updateScanRecord(bluetoothLeDevice.getScanRecord());
         } else if (scanEntry != null) {
             final ScanFilter filter = scanEntry.getKey();
-            device = filter.onSerializable(bluetoothLeDevice);
+            device = filter.onReEncapsulation(bluetoothLeDevice);
             map.put(bluetoothLeDevice.getAddress(), device);
         } else {
             device = bluetoothLeDevice;
