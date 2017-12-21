@@ -31,3 +31,6 @@ proguard/
 # Android Studio captures folder
 captures/
 .idea/
+sample/sample.iml
+library/library.iml
+IBeaconSupport/IBeaconSupport.iml

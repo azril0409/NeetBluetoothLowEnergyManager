@@ -99,11 +99,4 @@ public abstract class IBeaconUtil {
         }
         return false;
     }
-
-    public static double calculateDistance(int txPower, double rssi, float coefficient) {
-        if (rssi == 0) {
-            return -1.0; // if we cannot determine accuracy, return -1.
-        }
-        return Math.pow(10d, ((double) txPower - rssi) / (10 * coefficient));
-    }
 }

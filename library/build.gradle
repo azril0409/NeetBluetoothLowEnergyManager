@@ -25,16 +25,16 @@ dependencies {
     compile 'com.android.support:support-annotations:24.2.1'
 }
 
-def libname = 'NeetBluetoothLEManager_203.jar'
+def name = 'NeetBluetoothLEManager_204.jar'
+def toPath = '../librarys/'
+def fromPath = 'build/intermediates/bundles/release/'
 task clearAar(type: Delete) {
-    delete '../librarys/'
+    delete toPath + '/' + name
 }
 task makeAar(type: Copy) {
-    from('build/intermediates/bundles/release/')
-    into('../librarys/')
+    from(fromPath)
+    into(toPath)
     include('classes.jar')
-    include('jni/**')
-    rename('classes.jar', libname)
+    rename('classes.jar', name)
 }
-
-makeAar.dependsOn(clearAar, build)
+makeAar.dependsOn(clearAar, "build")

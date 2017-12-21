@@ -25,7 +25,7 @@ dependencies {
 }
 
 def name = 'iBeaconSupport.jar'
-def toPath = '../aar/'
+def toPath = '../librarys/'
 def fromPath = 'build/intermediates/bundles/release/'
 task clearAar(type: Delete) {
     delete toPath + '/' + name

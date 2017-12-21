@@ -5,6 +5,7 @@ import android.os.Parcel;
 
 import library.neetoffice.com.bluetoothmanager.device.BluetoothLeDevice;
 import library.neetoffice.com.bluetoothmanager.device.BluetoothLeDeviceImpl;
+import library.neetoffice.com.bluetoothmanager.util.DistanceUtil;
 
 /**
  * Created by Deo-chainmeans on 2017/11/20.
@@ -66,7 +67,7 @@ public class IBeaconDeviceImpl extends BluetoothLeDeviceImpl implements IBeaconD
 
     @Override
     public double getDistance(float coefficient) {
-        return IBeaconUtil.calculateDistance(getCalibratedTxPower(), getRunningAverageRssi(), coefficient);
+        return DistanceUtil.calculateDistance(getCalibratedTxPower(), getRunningAverageRssi(), coefficient);
     }
 
     @Override
